@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
+4. Start the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+   npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack & Reasoning
 
-## Learn More
+**Next.js + Tailwind CSS**  
+Next.js App Router allowed me to manage both frontend and API routes in a single project. Tailwind enabled fast, responsive UI development without writing custom CSS.
 
-To learn more about Next.js, take a look at the following resources:
+**Supabase**  
+Quick setup, generous free tier, and a simple JavaScript client. Database, API, and storage all in one platform — ideal for a time-constrained project.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Rule-based chatbot (no AI API)**  
+I chose a rule-based state machine over an AI API integration. Within a 6-hour limit, reliability and debuggability matter more than conversational flexibility. An AI integration would have introduced additional complexity around error handling and unpredictable responses. I noted this as a future improvement.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Ambiguous PRD Decisions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**What does the chatbot ask, and in what order?**  
+I designed a 4-step flow: name → company → problem → email. Email is collected last intentionally — users are more willing to share contact details after they've had a chance to explain their needs.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Tone and personality?**  
+Warm and concise. The bot greets users by name, keeps sentences short, and never feels like a form. Professional but not corporate.
+
+**Good lead vs. bad lead?**  
+I implemented an automatic scoring system (1–10):
+
+- Email provided: +4 points
+- Company name provided: +2 points
+- Detailed problem description (20+ chars): +3 points
+- Name provided: +1 point
+
+Score 7+: Hot (green), 4–6: Warm (yellow), 0–3: Cold (gray)
+
+**Admin view design?**  
+Summary cards at the top (total, hot, warm leads) and a sortable table below. The sales team can open it once a day and immediately see who reached out, why, and how urgent it is.
+
+**Spam and bad-faith usage?**  
+Email validation is required before submission. A minimum of 4 conversation steps must be completed before a lead is saved. Empty responses prompt the bot to repeat the question.
+
+**What if a visitor doesn't want to answer?**  
+The bot repeats the question once. Fields other than email can be skipped — the system still saves the lead with whatever data was collected.
+
+---
+
+## What I Couldn't Finish in 6 Hours
+
+- Email notifications when a new lead arrives
+- Search and filter on the admin panel
+- Full conversation transcript view in admin
+- Claude API integration for more natural conversation flow
+- Rate limiting for spam protection
+
+---
+
+## AI Assistance
+
+I used Claude (Anthropic) as a coding assistant during development. All code was reviewed, understood, and adapted by me. I can explain any part of the codebase.
+
+---
+
+## Time Spent
+
+~3 hours
