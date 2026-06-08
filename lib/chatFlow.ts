@@ -167,7 +167,8 @@ export function scoreLead(data: LeadData): number {
   if (data.urgency) {
     const u = data.urgency.toLowerCase();
     if (u.includes("hemen")) score += 3;
-    else if (u.includes("1") || u.includes("3")) score += 1;
+    else if (u.includes("araştır") || u.includes("bilgi")) score += 1;
+    else score += 2;
   }
   if (data.team_size) {
     const n = parseInt(data.team_size);
