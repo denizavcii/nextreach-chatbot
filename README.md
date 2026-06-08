@@ -110,12 +110,6 @@ E-posta veya telefon verilmezse talep sisteme **kaydedilmez**.
 
 ---
 
-## Yapay Zeka Kullanımı
-
-Geliştirme sürecinde Claude (Anthropic) ile çalıştım. Tüm kodu inceledim ve açıklayabilirim.
-
----
-
 ## Toplam Süre
 
 ~5,5 saat
