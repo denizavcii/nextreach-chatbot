@@ -11,9 +11,13 @@ interface Lead {
   created_at: string;
   name: string;
   company: string;
+  sector: string;
   email: string;
+  phone: string;
   pain_point: string;
   score: number;
+  is_duplicate: boolean;
+  is_read: boolean;
   full_transcript: Message[];
 }
 
@@ -23,13 +27,27 @@ export default function AdminPage() {
   const [selected, setSelected] = useState<Lead | null>(null);
 
   useEffect(() => {
-    fetch("/api/leads")
-      .then((r) => r.json())
-      .then((data) => {
-        setLeads(data);
-        setLoading(false);
-      });
+    fetchLeads();
   }, []);
+
+  async function fetchLeads() {
+    const res = await fetch("/api/leads");
+    const data = await res.json();
+    setLeads(data);
+    setLoading(false);
+  }
+
+  async function markAsRead(lead: Lead) {
+    if (lead.is_read) return;
+    await fetch("/api/leads", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: lead.id, is_read: true }),
+    });
+    setLeads((prev) =>
+      prev.map((l) => (l.id === lead.id ? { ...l, is_read: true } : l)),
+    );
+  }
 
   function scoreColor(score: number) {
     if (score >= 7) return "bg-green-100 text-green-800";
@@ -46,14 +64,22 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Gelen Talepler</h1>
-          <p className="text-gray-500 mt-1">
-            Chatbot üzerinden gelen iletişim talepleri
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Gelen Talepler</h1>
+            <p className="text-gray-500 mt-1">
+              Chatbot üzerinden gelen iletişim talepleri
+            </p>
+          </div>
+          <button
+            onClick={fetchLeads}
+            className="text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-200 px-4 py-2 rounded-lg transition"
+          >
+            Yenile
+          </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-sm text-gray-500">Toplam Talep</p>
             <p className="text-2xl font-bold text-gray-900 mt-1">
@@ -67,9 +93,15 @@ export default function AdminPage() {
             </p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-sm text-gray-500">Orta Lead</p>
-            <p className="text-2xl font-bold text-yellow-600 mt-1">
-              {leads.filter((l) => l.score >= 4 && l.score < 7).length}
+            <p className="text-sm text-gray-500">Okunmadı</p>
+            <p className="text-2xl font-bold text-indigo-600 mt-1">
+              {leads.filter((l) => !l.is_read).length}
+            </p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <p className="text-sm text-gray-500">Daha Önce Ulaşmış</p>
+            <p className="text-2xl font-bold text-orange-500 mt-1">
+              {leads.filter((l) => l.is_duplicate).length}
             </p>
           </div>
         </div>
@@ -89,10 +121,13 @@ export default function AdminPage() {
                     Kişi
                   </th>
                   <th className="text-left px-6 py-3 text-gray-500 font-medium">
+                    Sektör
+                  </th>
+                  <th className="text-left px-6 py-3 text-gray-500 font-medium">
                     Sorun
                   </th>
                   <th className="text-left px-6 py-3 text-gray-500 font-medium">
-                    E-posta
+                    İletişim
                   </th>
                   <th className="text-left px-6 py-3 text-gray-500 font-medium">
                     Skor
@@ -106,24 +141,44 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody>
-                {leads.map((lead, i) => (
+                {leads.map((lead) => (
                   <tr
                     key={lead.id}
-                    className={`border-b border-gray-50 hover:bg-gray-50 transition ${i % 2 === 0 ? "" : "bg-gray-50/50"}`}
+                    className={`border-b border-gray-50 hover:bg-gray-50 transition ${!lead.is_read ? "bg-indigo-50/30" : ""}`}
                   >
                     <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900">
-                        {lead.name || "—"}
-                      </p>
-                      <p className="text-gray-400 text-xs mt-0.5">
-                        {lead.company || "—"}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {!lead.is_read && (
+                          <span className="w-2 h-2 bg-indigo-500 rounded-full flex-shrink-0"></span>
+                        )}
+                        <div>
+                          <p className="font-medium text-gray-900">
+                            {lead.name || "—"}
+                          </p>
+                          <p className="text-gray-400 text-xs mt-0.5">
+                            {lead.company || "—"}
+                          </p>
+                        </div>
+                      </div>
+                      {lead.is_duplicate && (
+                        <span className="text-xs text-orange-500 font-medium">
+                          ⚠ Daha önce ulaşmış
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {lead.sector || "—"}
                     </td>
                     <td className="px-6 py-4 text-gray-600 max-w-xs">
                       <p className="truncate">{lead.pain_point || "—"}</p>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {lead.email || "—"}
+                    <td className="px-6 py-4">
+                      <p className="text-gray-600 text-xs">
+                        {lead.email || "—"}
+                      </p>
+                      <p className="text-gray-400 text-xs mt-0.5">
+                        {lead.phone || "—"}
+                      </p>
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -141,7 +196,10 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => setSelected(lead)}
+                        onClick={() => {
+                          setSelected(lead);
+                          markAsRead(lead);
+                        }}
                         className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
                       >
                         Görüntüle →
@@ -169,7 +227,12 @@ export default function AdminPage() {
                 <p className="font-semibold text-gray-900">
                   {selected.name} — {selected.company}
                 </p>
-                <p className="text-sm text-gray-400 mt-0.5">{selected.email}</p>
+                <p className="text-sm text-gray-400 mt-0.5">
+                  {selected.sector}
+                </p>
+                <p className="text-sm text-gray-400">
+                  {selected.email} {selected.phone && `· ${selected.phone}`}
+                </p>
               </div>
               <button
                 onClick={() => setSelected(null)}
