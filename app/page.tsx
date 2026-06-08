@@ -3,7 +3,6 @@ import ChatWidget from "@/components/ChatWidget";
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
-      {/* Hero Section */}
       <div className="max-w-4xl mx-auto px-6 py-24 text-center">
         <div className="inline-block bg-indigo-100 text-indigo-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
           B2B E-Ticaret Analitiği
@@ -16,7 +15,7 @@ export default function Home() {
 
         <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto">
           NextReach ile sipariş trendlerini, müşteri davranışlarını ve envanter
-          performansını tek dashboard'dan takip edin.
+          performansını tek dashboard&apos;dan takip edin.
         </p>
 
         <div className="flex gap-4 justify-center">
@@ -28,7 +27,6 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Fake stats */}
         <div className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto">
           <div>
             <p className="text-3xl font-bold text-indigo-600">500+</p>
@@ -44,6 +42,15 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <footer className="border-t border-gray-100 py-6 text-center mt-10">
+        <a
+          href="/admin"
+          className="text-sm text-gray-400 hover:text-indigo-600 transition"
+        >
+          Satış Ekibi Girişi →
+        </a>
+      </footer>
 
       <ChatWidget />
     </main>
