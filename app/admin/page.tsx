@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 
+interface Message {
+  role: "bot" | "user";
+  text: string;
+}
+
 interface Lead {
   id: string;
   created_at: string;
@@ -9,11 +14,13 @@ interface Lead {
   email: string;
   pain_point: string;
   score: number;
+  full_transcript: Message[];
 }
 
 export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Lead | null>(null);
 
   useEffect(() => {
     fetch("/api/leads")
@@ -93,6 +100,9 @@ export default function AdminPage() {
                   <th className="text-left px-6 py-3 text-gray-500 font-medium">
                     Tarih
                   </th>
+                  <th className="text-left px-6 py-3 text-gray-500 font-medium">
+                    Konuşma
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -129,6 +139,14 @@ export default function AdminPage() {
                         year: "numeric",
                       })}
                     </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => setSelected(lead)}
+                        className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                      >
+                        Görüntüle →
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -136,6 +154,58 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {selected && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <p className="font-semibold text-gray-900">
+                  {selected.name} — {selected.company}
+                </p>
+                <p className="text-sm text-gray-400 mt-0.5">{selected.email}</p>
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-gray-400 hover:text-gray-600 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
+              {selected.full_transcript &&
+              selected.full_transcript.length > 0 ? (
+                selected.full_transcript.map((msg, i) => (
+                  <div
+                    key={i}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-xs px-3 py-2 rounded-2xl text-sm ${
+                        msg.role === "user"
+                          ? "bg-indigo-600 text-white rounded-br-sm"
+                          : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                      }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-400 text-sm">
+                  Konuşma geçmişi yok.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
