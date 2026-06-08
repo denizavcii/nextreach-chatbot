@@ -80,39 +80,39 @@ export default function ChatWidget() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xl transition-all duration-200 rounded-2xl px-14 py-6 font-bold text-2xl hover:scale-105 animate-pulse hover:animate-none tracking-wide"
+        className="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg transition-all duration-200 rounded-full px-6 py-3 font-semibold text-sm hover:scale-105"
       >
-        Bize Ulaşın
+        💬 Bize Ulaşın
       </button>
 
       {isOpen && (
         <div
-          className="fixed bottom-32 right-6 w-[480px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-100"
-          style={{ height: "600px" }}
+          className="fixed bottom-20 right-6 w-80 bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-100"
+          style={{ height: "480px" }}
         >
-          <div className="bg-indigo-600 text-white p-5 rounded-t-2xl flex justify-between items-center">
+          <div className="bg-indigo-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
             <div>
-              <p className="font-semibold text-lg">NextReach Asistanı</p>
-              <p className="text-indigo-200 text-sm mt-0.5">
+              <p className="font-semibold text-sm">NextReach Asistanı</p>
+              <p className="text-indigo-200 text-xs mt-0.5">
                 Genellikle hemen yanıt verir
               </p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-indigo-200 hover:text-white text-2xl"
+              className="text-indigo-200 hover:text-white text-lg"
             >
               ✕
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
             {messages.map((m, i) => (
               <div
                 key={i}
                 className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] px-4 py-3 rounded-2xl text-base leading-relaxed ${
+                  className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm leading-relaxed ${
                     m.role === "user"
                       ? "bg-indigo-600 text-white rounded-br-sm"
                       : "bg-white text-gray-800 rounded-bl-sm shadow-sm border border-gray-100"
@@ -124,7 +124,7 @@ export default function ChatWidget() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-white px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100 text-gray-400 text-base">
+                <div className="bg-white px-4 py-2 rounded-2xl rounded-bl-sm shadow-sm border border-gray-100 text-gray-400 text-sm">
                   ···
                 </div>
               </div>
@@ -133,19 +133,19 @@ export default function ChatWidget() {
           </div>
 
           {!submitted && (
-            <div className="p-4 border-t border-gray-100 bg-white rounded-b-2xl flex gap-2">
+            <div className="p-3 border-t border-gray-100 bg-white rounded-b-2xl flex gap-2">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Mesajınızı yazın..."
-                className="flex-1 border border-gray-200 rounded-full px-5 py-3 text-base focus:outline-none focus:border-indigo-400"
+                className="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-400"
                 disabled={loading}
               />
               <button
                 onClick={handleSend}
                 disabled={loading}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-3 text-base font-medium disabled:opacity-50 transition"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-4 py-2 text-sm font-medium disabled:opacity-50 transition"
               >
                 Gönder
               </button>
