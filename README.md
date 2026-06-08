@@ -1,71 +1,121 @@
-4. Start the development server:
+# NextReach Chatbot
+
+NextReach'in landing page'indeki "Bize Ulaşın" formunun yerini alan web chatbot'u. 6 saatlik stajyer değerlendirme görevi olarak geliştirildi.
+
+**Canlı Link:** https://nextreach-chatbot-snowy.vercel.app  
+**Admin Panel:** https://nextreach-chatbot-snowy.vercel.app/admin
+
+---
+
+## Kurulum
 
 ```bash
-   npm run dev
+git clone https://github.com/denizavcii/nextreach-chatbot.git
+cd nextreach-chatbot
+npm install
 ```
 
-5. Open http://localhost:3000 in your browser.
+`.env.local` dosyası oluştur:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase_anon_key
+```
+
+```bash
+npm run dev
+```
+
+Tarayıcıda aç: http://localhost:3000
 
 ---
 
-## Tech Stack & Reasoning
+## Teknoloji Seçimleri
 
-**Next.js + Tailwind CSS**  
-Next.js App Router allowed me to manage both frontend and API routes in a single project. Tailwind enabled fast, responsive UI development without writing custom CSS.
-
-**Supabase**  
-Quick setup, generous free tier, and a simple JavaScript client. Database, API, and storage all in one platform — ideal for a time-constrained project.
-
-**Rule-based chatbot (no AI API)**  
-I chose a rule-based state machine over an AI API integration. Within a 6-hour limit, reliability and debuggability matter more than conversational flexibility. An AI integration would have introduced additional complexity around error handling and unpredictable responses. I noted this as a future improvement.
+| Teknoloji             | Neden                                                       |
+| --------------------- | ----------------------------------------------------------- |
+| Next.js + Tailwind    | Frontend ve API route'ları tek projede, hızlı UI geliştirme |
+| Supabase              | Hızlı kurulum, ücretsiz tier, basit JS client               |
+| Kural tabanlı chatbot | Öngörülebilir, debug edilebilir, 6 saatlik limite uygun     |
 
 ---
 
-## Ambiguous PRD Decisions
+## Nasıl Çalışır
 
-**What does the chatbot ask, and in what order?**  
-I designed a 4-step flow: name → company → problem → email. Email is collected last intentionally — users are more willing to share contact details after they've had a chance to explain their needs.
+Ziyaretçi "Bize Ulaşın" butonuna tıklar, chatbot sırayla şunları toplar:
 
-**Tone and personality?**  
-Warm and concise. The bot greets users by name, keeps sentences short, and never feels like a form. Professional but not corporate.
+1. İsim
+2. Şirket adı
+3. Sektör
+4. Sorun / ihtiyaç
+5. Ekip büyüklüğü
+6. Aciliyet
+7. E-posta
+8. Telefon (isteğe bağlı)
 
-**Good lead vs. bad lead?**  
-I implemented an automatic scoring system (1–10):
-
-- Email provided: +4 points
-- Company name provided: +2 points
-- Detailed problem description (20+ chars): +3 points
-- Name provided: +1 point
-
-Score 7+: Hot (green), 4–6: Warm (yellow), 0–3: Cold (gray)
-
-**Admin view design?**  
-Summary cards at the top (total, hot, warm leads) and a sortable table below. The sales team can open it once a day and immediately see who reached out, why, and how urgent it is.
-
-**Spam and bad-faith usage?**  
-Email validation is required before submission. A minimum of 4 conversation steps must be completed before a lead is saved. Empty responses prompt the bot to repeat the question.
-
-**What if a visitor doesn't want to answer?**  
-The bot repeats the question once. Fields other than email can be skipped — the system still saves the lead with whatever data was collected.
+E-posta veya telefon verilmezse talep sisteme **kaydedilmez**.
 
 ---
 
-## What I Couldn't Finish in 6 Hours
+## Lead Skor Sistemi (1-10)
 
-- Email notifications when a new lead arrives
-- Search and filter on the admin panel
-- Full conversation transcript view in admin
-- Claude API integration for more natural conversation flow
-- Rate limiting for spam protection
+| Bilgi                                   | Puan |
+| --------------------------------------- | ---- |
+| E-posta + telefon ikisi                 | +4   |
+| Sadece e-posta veya telefon             | +2   |
+| Aciliyet: Hemen                         | +3   |
+| Aciliyet: 1-3 ay içinde                 | +2   |
+| Aciliyet: Sadece araştırıyorum          | +1   |
+| Ekip 50+ kişi                           | +2   |
+| Ekip 10-49 kişi                         | +1   |
+| Detaylı sorun açıklaması (20+ karakter) | +1   |
+
+- **7-10 → Sıcak** — hemen ara
+- **4-6 → Orta** — bu hafta dön
+- **0-3 → Soğuk** — düşük öncelik
 
 ---
 
-## AI Assistance
+## Admin Panel Özellikleri
 
-I used Claude (Anthropic) as a coding assistant during development. All code was reviewed, understood, and adapted by me. I can explain any part of the codebase.
+- Özet kartlar: toplam talep, sıcak lead, okunmadı, daha önce ulaşmış
+- Her lead için tam konuşma geçmişi
+- Okundu/okunmadı işareti
+- Daha önce ulaşmış tespiti (aynı email veya telefon)
+- Yenile butonu
 
 ---
 
-## Time Spent
+## PRD'de Muğlak Bırakılan Kararlar
 
-~3 hours
+**Chatbot tonu:** Samimi ve kısa. Resmi değil ama profesyonel.
+
+**İyi/kötü lead ayrımı:** Ulaşılabilirlik ve aciliyet en yüksek puanı alıyor — satış ekibi için bunlar öncelikli.
+
+**Admin view:** Üstte özet kartlar, altta tablo. Satış ekibi günde bir bakışta "bugün kim gelmiş, neden" sorusunu cevaplayabiliyor.
+
+**Spam koruması:** E-posta validasyonu zorunlu, minimum 7 adım tamamlanmadan kayıt yapılmıyor. Aynı email veya telefon tekrar gelirse işaretleniyor.
+
+**Soru atlamak istemezse:** Telefon isteğe bağlı. Diğer sorular bir kez tekrarlanıyor ama zorlanmıyor.
+
+---
+
+## Daha Fazla Zamanda Yapılacaklar
+
+- Yeni lead gelince satış ekibine e-posta bildirimi
+- Admin panelde filtreleme ve arama
+- Rate limiting (spam engelleme)
+- Claude API ile daha doğal chatbot akışı
+- Admin panelde lead'e not ekleme
+
+---
+
+## Yapay Zeka Kullanımı
+
+Geliştirme sürecinde Claude (Anthropic) ile çalıştım. Tüm kodu inceledim ve açıklayabilirim.
+
+---
+
+## Toplam Süre
+
+~5,5 saat
